@@ -1,0 +1,12 @@
+{
+  "name": "flappy-wynn-server",
+  "version": "3.0.0",
+  "description": "Flappy Wynn Railway backend with server-verified leaderboard and anti-cheat",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
