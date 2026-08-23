@@ -1,6 +1,6 @@
 // Flappy Wynn frontend API configuration.
-// After deploying the backend to Railway, replace the URL below with your Railway public URL.
-// Example:
-// window.FLAPPY_WYNN_API_BASE = 'https://flappywynngame-production.up.railway.app/api';
-
-window.FLAPPY_WYNN_API_BASE = 'https://flappywynngame-production.up.railway.app/api';
+// When frontend and backend are deployed together on Railway,
+// an empty base uses the same origin automatically.
+// If the frontend is hosted separately (for example on Vercel),
+// replace this with: https://YOUR-RAILWAY-DOMAIN.up.railway.app/api
+window.FLAPPY_WYNN_API_BASE = '';
