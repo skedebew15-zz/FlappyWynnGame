@@ -147,7 +147,7 @@ canvas{display:block;width:100%;height:100%;cursor:pointer}
 </style>
 </head>
 <body>
-<script src="/api-config.js"></script>
+<script src="/api-config.js?v=3"></script>
 <img id="gameBackground" src="/game-background.png" alt="" style="display:none">
 
 <div id="gameWrap">
@@ -222,7 +222,10 @@ const lbCount        = $('lbCount');
 const lbTabs         = document.querySelectorAll('.lb-tab');
 
 // ── Config ──
-const API_BASE = (window.FLAPPY_WYNN_API_BASE || window.location.origin + '/api').replace(/\/$/, '');
+const configuredApi = window.FLAPPY_WYNN_API_BASE || '';
+const API_BASE = (/YOUR-RAILWAY-SERVICE|your-railway-service/i.test(configuredApi)
+  ? window.location.origin + '/api'
+  : (configuredApi || window.location.origin + '/api')).replace(/\/$/, '');
 const GRAVITY       = 0.48;
 const FLAP_STRENGTH = -8.2;
 const PIPE_SPEED    = 2.6;
