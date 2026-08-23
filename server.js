@@ -179,7 +179,8 @@ function serveStatic(req, res) {
     }
     res.writeHead(200, {
       'Content-Type': mime,
-      'Cache-Control': ext === '.html' ? 'no-cache' : 'public, max-age=3600',
+      'Cache-Control': (ext === '.html' || path.basename(filePath) === 'api-config.js')
+      ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
     });
     res.end(data);
   });

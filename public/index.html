@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#0a0a1a}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0a1a;touch-action:none}
 body{
   display:flex;justify-content:center;align-items:center;
   font-family:'Inter',system-ui,sans-serif;
@@ -16,7 +16,7 @@ body{
 }
 #gameWrap{display:flex;gap:16px;align-items:stretch;max-width:860px;width:100%;padding:12px}
 #gameContainer{
-  position:relative;width:400px;height:600px;flex-shrink:0;
+  position:relative;touch-action:none;width:400px;height:600px;flex-shrink:0;
   border-radius:16px;overflow:hidden;
   box-shadow:0 0 50px rgba(155,77,255,0.25),0 8px 32px rgba(0,0,0,0.5);
   border:2px solid rgba(155,77,255,0.3);
@@ -200,6 +200,7 @@ canvas{display:block;width:100%;height:100%;cursor:pointer}
 // ═══════════════════════════════════════════
 
 const canvas = document.getElementById('gameCanvas');
+const gameContainer = document.getElementById('gameContainer');
 const ctx    = canvas.getContext('2d');
 const W = canvas.width, H = canvas.height;
 
@@ -590,10 +591,24 @@ function gameLoop(ts){
 }
 
 // ── Events ──
-function handleInput(e){e.preventDefault();if(gameState==='over')return;flap()}
-canvas.addEventListener('pointerdown',handleInput);
+function handleInput(e){
+  if(e && e.target && e.target.closest && e.target.closest('button,input')) return;
+  if(e && e.cancelable) e.preventDefault();
+  if(gameState==='over')return;
+  flap();
+}
+// Listen on the container, not only the canvas: the start/game-over overlays cover it on mobile.
+let lastPointerInput=0;
+gameContainer.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse' || e.pointerType==='touch' || e.pointerType==='pen'){
+    lastPointerInput=Date.now(); handleInput(e);
+  }
+},{passive:false});
+// Android WebViews/browsers that expose touch without Pointer Events.
+gameContainer.addEventListener('touchstart',e=>{
+  if(e.touches.length===1 && Date.now()-lastPointerInput>350) handleInput(e);
+},{passive:false});
 document.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){if(gameState!=='over')handleInput(e)}});
-document.addEventListener('touchstart',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
 
 // ── Init ──
 resetGame();startPolling();requestAnimationFrame(gameLoop);
