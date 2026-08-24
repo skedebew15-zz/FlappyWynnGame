@@ -147,7 +147,7 @@ canvas{display:block;width:100%;height:100%;cursor:pointer}
 </style>
 </head>
 <body>
-<script src="/api-config.js?v=3"></script>
+<script src="/api-config.js?v=4"></script>
 <img id="gameBackground" src="/game-background.png" alt="" style="display:none">
 
 <div id="gameWrap">
@@ -410,20 +410,26 @@ function drawGround(){
   for(let x=-groundOffset;x<W;x+=24){ctx.beginPath();ctx.moveTo(x,H-GROUND_HEIGHT+14);ctx.lineTo(x+12,H-GROUND_HEIGHT+6);ctx.lineTo(x+24,H-GROUND_HEIGHT+14);ctx.fill()}
 }
 function drawPipe(pipe){
-  const topH=pipe.top,botY=topH+PIPE_GAP,botH=H-GROUND_HEIGHT-botY;
-  const capH=26,capW=PIPE_WIDTH+10,capX=pipe.x-5;
-  const g=ctx.createLinearGradient(pipe.x,0,pipe.x+PIPE_WIDTH,0);
-  g.addColorStop(0,'#6d1a9b');g.addColorStop(0.28,'#d344d7');g.addColorStop(0.58,'#8d2ab5');g.addColorStop(1,'#35065f');
-  const cg=ctx.createLinearGradient(capX,0,capX+capW,0);
-  cg.addColorStop(0,'#521077');cg.addColorStop(0.3,'#f06add');cg.addColorStop(0.7,'#8d2ab5');cg.addColorStop(1,'#290342');
-  ctx.fillStyle=g;ctx.fillRect(pipe.x,0,PIPE_WIDTH,topH);
-  ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fillRect(pipe.x+6,0,8,topH);
-  ctx.fillStyle=cg;rRect(capX,topH-capH,capW,capH,4);ctx.fill();
-  ctx.strokeStyle='#25063f';ctx.lineWidth=1.5;rRect(capX,topH-capH,capW,capH,4);ctx.stroke();
-  ctx.fillStyle=g;ctx.fillRect(pipe.x,botY,PIPE_WIDTH,botH);
-  ctx.fillStyle='rgba(255,255,255,0.15)';ctx.fillRect(pipe.x+6,botY,8,botH);
-  ctx.fillStyle=cg;rRect(capX,botY,capW,capH,4);ctx.fill();
-  ctx.strokeStyle='#25063f';ctx.lineWidth=1.5;rRect(capX,botY,capW,capH,4);ctx.stroke();
+  // Safari/iOS-safe obstacle renderer: solid base first, neon gradient as enhancement.
+  const topH=Math.max(0,Number(pipe.top)||0), botY=topH+PIPE_GAP;
+  const botH=Math.max(0,H-GROUND_HEIGHT-botY);
+  const capH=26, capW=PIPE_WIDTH+10, capX=pipe.x-5;
+  if(!Number.isFinite(pipe.x) || botH<=0) return;
+  ctx.save();
+  ctx.globalCompositeOperation='source-over';
+  ctx.shadowColor='rgba(255,65,220,.72)';ctx.shadowBlur=12;
+  // Solid fallback guarantees visibility on iOS Safari.
+  ctx.fillStyle='#8c28b8';ctx.fillRect(pipe.x,0,PIPE_WIDTH,topH);
+  ctx.fillRect(pipe.x,botY,PIPE_WIDTH,botH);
+  ctx.fillStyle='#d84cda';rRect(capX,topH-capH,capW,capH,4);ctx.fill();
+  rRect(capX,botY,capW,capH,4);ctx.fill();
+  // Highlight strip and dark outline.
+  ctx.shadowBlur=0;ctx.fillStyle='rgba(255,226,255,.30)';
+  ctx.fillRect(pipe.x+6,0,7,topH);ctx.fillRect(pipe.x+6,botY,7,botH);
+  ctx.strokeStyle='#26063f';ctx.lineWidth=2;
+  rRect(capX,topH-capH,capW,capH,4);ctx.stroke();
+  rRect(capX,botY,capW,capH,4);ctx.stroke();
+  ctx.restore();
 }
 function rRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath()}
 
